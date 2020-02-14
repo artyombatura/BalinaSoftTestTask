@@ -1,0 +1,6 @@
+module Pods_BalinaSoftTestApp {
+  umbrella header "Pods-BalinaSoftTestApp-umbrella.h"
+
+  export *
+  module * { export * }
+}
