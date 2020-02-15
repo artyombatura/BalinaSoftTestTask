@@ -10,19 +10,31 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    //MARK: - Outlets
     @IBOutlet weak var developersTableView: UITableView!
     
+    //MARK: - Let's & Var's
     private var developers = [Developer]()
-    
+    private var pickedDeveloper: Developer!
     private var pageToLoad: Int = 0
+    
+    let imagePicker = UIImagePickerController()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        //TableView Configurating
         developersTableView.delegate = self
         developersTableView.dataSource = self
         
+        //First Api Call
         fetchDataGET()
+        
+        //Image Picker Configuration
+        imagePicker.delegate = self
+        imagePicker.sourceType = .camera
+        
     }
     
 }
@@ -102,9 +114,38 @@ extension MainViewController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //CODE THERE
+        self.pickedDeveloper = self.developers[indexPath.row]
+        present(imagePicker, animated: true, completion: nil)
     }
     
 }
 
-
+//MARK: - UIImagePickerDelegate
+extension MainViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        //Getting image from camera
+        let image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
+        let imageJPEGFormat: Data? = image.pngData()
+        
+        //Do .POST request to API. Upload photo
+        if let name = self.pickedDeveloper.name,
+            let id = self.pickedDeveloper.id,
+            let imageData = imageJPEGFormat     {
+            
+            let apiRouter = ApiRouter.Post(id: id, name: name, image: imageData)
+            
+//            apiRouter.postRequest(imageData: imageData)
+        }
+        
+        //Camera closing
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        
+        //Camera closing
+        picker.dismiss(animated: true, completion: nil)
+    }
+}
