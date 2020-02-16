@@ -40,15 +40,16 @@ enum ApiRouter {
 //        case .Post(let id, let name, let image):
 //            return ["name" : name,
 //                    "typeId" : id,
-//                    "image" : image]
+//                    "photo" : image]
 //        }
 //    }
+    
     private var parameters: Parameters {
-        
+
         switch self {
         case .Get(let page):
             return ["page" : page]
-            
+
         case .Post(let id, let name, let image):
             return ["name" : name,
                     "typeId" : id]
@@ -91,31 +92,25 @@ enum ApiRouter {
     
     func postRequest(imageData: Data) {
         
-//        AF.request(fullUrl, method: method, parameters: parameters, encoding: URLEncoding.default, headers: nil, interceptor: nil).responseJSON { (json) in
-//
-//            switch json.result {
-//            case .success(let result):
-//                print(result)
-//
-//            case .failure(let error):
-//                print(error)
-//            }
-//
-//        }
         
-        
-//        AF.upload(multipartFormData: { (multiPart) in
-//            for (key, value) in self.parameters {
-//                multiPart.append((value as! String).data(using: .utf8)!, withName: key)
-//            }
-//            
-//            multiPart.append(imageData, withName: "file", fileName: "file.png", mimeType: "image/png")
-//        }, to: fullUrl).response { response in
-//            print(response)
-//        }
-        
+        AF.upload(multipartFormData: { (multipartFormData) in
+            multipartFormData.append(imageData, withName: "photo", fileName: "photo/jpeg", mimeType: "photo/jpeg")
+            
+            for (key, value) in self.parameters {
+                multipartFormData.append((value as! String).data(using: .utf8)!, withName: key)
+            }
+        }, to: self.fullUrl).responseJSON { (json) in
 
-    }
+            switch json.result {
+            case .success(let value):
+                print(value)
+            case .failure(let error):
+                print(error)
+            }
+        }
+
     
+    
+    }
     
 }

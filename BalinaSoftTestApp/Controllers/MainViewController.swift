@@ -127,16 +127,17 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
         
         //Getting image from camera
         let image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
-        let imageJPEGFormat: Data? = image.pngData()
+        let imageJPEGFormat: Data? = image.jpegData(compressionQuality: 1.0)
+
         
         //Do .POST request to API. Upload photo
         if let name = self.pickedDeveloper.name,
             let id = self.pickedDeveloper.id,
-            let imageData = imageJPEGFormat     {
+            let imageData = imageJPEGFormat {
             
             let apiRouter = ApiRouter.Post(id: id, name: name, image: imageData)
             
-//            apiRouter.postRequest(imageData: imageData)
+            apiRouter.postRequest(imageData: imageData)
         }
         
         //Camera closing
