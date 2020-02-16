@@ -14,7 +14,7 @@ enum ApiRouter {
     
     // All active cases
     case Get(page: Int)
-    case Post(id: String, name: String, image: Data)
+    case Post(id: String, name: String)
     
     
     // Calculated var's
@@ -50,7 +50,7 @@ enum ApiRouter {
         case .Get(let page):
             return ["page" : page]
 
-        case .Post(let id, let name, let image):
+        case .Post(let id, let name):
             return ["name" : name,
                     "typeId" : id]
         }
@@ -90,27 +90,28 @@ enum ApiRouter {
     }
     
     
-    func postRequest(imageData: Data) {
+    func postRequest(image: UIImage) {
         
+        let imageJPEGFormat: Data? = image.jpegData(compressionQuality: 0.3)
+        
+        guard let imageData = imageJPEGFormat else { return }
         
         AF.upload(multipartFormData: { (multipartFormData) in
-            multipartFormData.append(imageData, withName: "photo", fileName: "photo/jpeg", mimeType: "photo/jpeg")
+            
+            multipartFormData.append(imageData, withName: "photo", fileName: "photo/jpg", mimeType: "photo/jpg")
             
             for (key, value) in self.parameters {
+                
                 multipartFormData.append((value as! String).data(using: .utf8)!, withName: key)
             }
         }, to: self.fullUrl).responseJSON { (json) in
 
-            switch json.result {
-            case .success(let value):
-                print(value)
-            case .failure(let error):
-                print(error)
-            }
+            print(json)
         }
 
-    
-    
     }
+    
+    
+    
     
 }
